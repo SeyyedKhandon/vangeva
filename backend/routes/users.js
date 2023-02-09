@@ -1,18 +1,14 @@
 import express from "express";
+import {
+  getUserProfile,
+  loginUser,
+  registerUser,
+} from "../controllers/users.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json("read users");
-});
-router.post("/", (req, res) => {
-  res.status(200).json("create user");
-});
-router.put("/:id", (req, res) => {
-  res.json(`update user! ${req.params.id}`);
-});
-router.delete("/:id", (req, res) => {
-  res.json(`delete user! ${req.params.id}`);
-});
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.get("/profile", getUserProfile);
 
 export default router;
