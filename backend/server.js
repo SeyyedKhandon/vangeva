@@ -1,15 +1,15 @@
-import express from "express";
 import { config } from "dotenv";
-import "colors";
 const dotenv = config();
-console.log(dotenv);
+
+import "colors";
+import express from "express";
+import userRoute from "./routes/users.js";
 
 const port = process.env.PORT || 5000;
-
 const app = express();
 
-app.get("/", (req, res) => {
-  res.json("hello world!");
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use("/api/users", userRoute);
 
-app.listen(port, () => console.log(`Server started on port ${port}`.bgBlue));
+app.listen(port, () => console.log(`Server started on port ${port}`));
