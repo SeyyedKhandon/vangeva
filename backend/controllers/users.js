@@ -1,12 +1,18 @@
 import asyncHandler from "express-async-handler";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import userModel from "../models/user.js";
 
+export function generateJWTToken(id) {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
+}
 /**
  * @desc Show Profile
  * @route GET /api/users/profile
  * @access Private
  */
 const getUserProfile = asyncHandler(async (req, res) => {
-  res.json(`User Profile ${req.body}`);
+  res.json(req.user);
 });
 
 /**
@@ -20,13 +26,31 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Please add all fields!");
   }
+  const userExist = await userModel.findOne({ email });
+  if (userExist) {
+    res.status(400);
+    throw new Error("User already exists!");
+  }
 
-  res.status(201).json({
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const user = await userModel.create({
     name,
     email,
-    password,
-    message: "Successfully Registration!",
+    password: hashedPassword,
   });
+  if (user) {
+    res.status(201).json({
+      id: user.id,
+      name,
+      email,
+      token: generateJWTToken(user.id),
+    });
+  } else {
+    res.status(400);
+    res.json("Invalid User!");
+  }
 });
 
 /**
@@ -40,11 +64,18 @@ const loginUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Please add all fields!");
   }
-  res.status(201).json({
-    email,
-    password,
-    message: "Successfully Login!",
-  });
+  const user = await userModel.findOne({ email });
+  if (user && (await bcrypt.compare(password, user.password))) {
+    res.json({
+      id: user.id,
+      email,
+      name: user.name,
+      token: generateJWTToken(user.id),
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid Credentials!");
+  }
 });
 
 export { getUserProfile, loginUser, registerUser };
