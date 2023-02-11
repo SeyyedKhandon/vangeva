@@ -2,22 +2,27 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-function Login() {
+function Register() {
+  const name = useRef(null as any);
   const email = useRef(null as any);
   const password = useRef(null as any);
+  const secondPassword = useRef(null as any);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const submitHandler = (e: any) => {
     e.preventDefault();
-    setLoading(true);
+    if (password.current.value != secondPassword.current.value)
+      return toast("Password's do not match!");
 
     const info = {
+      name: name.current.value,
       email: email.current.value,
       password: password.current.value,
     };
 
-    fetch("/api/users/login", {
+    setLoading(true);
+    fetch("/api/users/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -29,7 +34,7 @@ function Login() {
         return Promise.reject(res.json());
       })
       .then((res) => {
-        toast(`${res.name} Logged in!`);
+        toast(`${res.name} Registered!`);
         localStorage.setItem("token", res.token);
         navigate("/profile");
       })
@@ -44,6 +49,17 @@ function Login() {
 
   return (
     <form method="post" onSubmit={submitHandler}>
+      <label htmlFor="name">
+        Email:
+        <input
+          ref={name}
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Enter your name"
+          required
+        />
+      </label>
       <label htmlFor="email">
         Email:
         <input
@@ -66,9 +82,20 @@ function Login() {
           required
         />
       </label>
+      <label htmlFor="secondPassword">
+        Retype Password:
+        <input
+          ref={secondPassword}
+          type="password"
+          id="secondPassword"
+          name="secondPassword"
+          placeholder="Retype your password"
+          required
+        />
+      </label>
       <button type="submit">Submit</button>
     </form>
   );
 }
 
-export default Login;
+export default Register;
