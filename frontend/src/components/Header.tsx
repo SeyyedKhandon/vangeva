@@ -20,6 +20,9 @@ export default function Header() {
         <li>
           <Link to="/profile">Profile</Link>
         </li>
+        <li>
+          <Link to="/add-post">Add Post</Link>
+        </li>
       </ul>
     </nav>
   );

@@ -3,8 +3,18 @@ import postModel from "../models/post.js";
 
 /**
  *
- * @desc Get Posts
+ * @desc Get All Posts
  * @route GET /api/posts
+ * @access Private
+ */
+const getAllPosts = asyncHandler(async (req, res) => {
+  const posts = await postModel.find({}).select("-userId");
+  res.json(posts);
+});
+
+/*
+ * @desc Get Posts
+ * @route GET /api/posts/:id
  * @access Private
  */
 const getPosts = asyncHandler(async (req, res) => {
@@ -86,4 +96,4 @@ const deletePost = asyncHandler(async (req, res) => {
   res.json(post);
 });
 
-export { getPosts, setPost, updatePost, deletePost };
+export { getAllPosts, getPosts, setPost, updatePost, deletePost };
