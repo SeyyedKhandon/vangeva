@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function Profile() {
-  const [state, setState] = useState({
-    name: "",
-    email: "",
-    token: localStorage.getItem("token"),
-  } as any);
+  const navigate = useNavigate();
+  const [state, setState] = useState(
+    () =>
+      ({
+        name: "",
+        email: "",
+        token: localStorage.getItem("token"),
+      } as any)
+  );
 
   useEffect(() => {
     fetch("/api/users/profile", {
@@ -27,7 +32,8 @@ export default function Profile() {
       })
       .catch(async (err) => {
         const error = await err;
-        toast(error.message);
+        toast.error(error.message);
+        navigate("/login");
       });
   }, []);
 

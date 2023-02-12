@@ -3,19 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function Login() {
-  const email = useRef(null as any);
-  const password = useRef(null as any);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState({ email: "", password: "" });
+
+  const onChangeHandler = (e: any) => {
+    setInfo((i) => ({ ...i, [e.target.name]: e.target.value }));
+  };
 
   const submitHandler = (e: any) => {
     e.preventDefault();
     setLoading(true);
-
-    const info = {
-      email: email.current.value,
-      password: password.current.value,
-    };
 
     fetch("/api/users/login", {
       method: "POST",
@@ -35,7 +33,7 @@ function Login() {
       })
       .catch(async (err) => {
         const error = await err;
-        toast(error.message);
+        toast.error(error.message);
       })
       .finally(() => setLoading(false));
   };
@@ -47,7 +45,8 @@ function Login() {
       <label htmlFor="email">
         Email:
         <input
-          ref={email}
+          value={info.email}
+          onChange={onChangeHandler}
           type="email"
           id="email"
           name="email"
@@ -58,7 +57,8 @@ function Login() {
       <label htmlFor="password">
         Password:
         <input
-          ref={password}
+          value={info.password}
+          onChange={onChangeHandler}
           type="password"
           id="password"
           name="password"

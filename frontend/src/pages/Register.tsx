@@ -3,23 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function Register() {
-  const name = useRef(null as any);
-  const email = useRef(null as any);
-  const password = useRef(null as any);
-  const secondPassword = useRef(null as any);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState({
+    name: "",
+    email: "",
+    password: "",
+    secondPassword: "",
+  });
+
+  const onChangeHandler = (e: any) => {
+    setInfo((i) => ({ ...i, [e.target.name]: e.target.value }));
+  };
 
   const submitHandler = (e: any) => {
     e.preventDefault();
-    if (password.current.value != secondPassword.current.value)
+    if (info.password != info.secondPassword)
       return toast("Password's do not match!");
-
-    const info = {
-      name: name.current.value,
-      email: email.current.value,
-      password: password.current.value,
-    };
 
     setLoading(true);
     fetch("/api/users/register", {
@@ -40,7 +40,7 @@ function Register() {
       })
       .catch(async (err) => {
         const error = await err;
-        toast(error.message);
+        toast.error(error.message);
       })
       .finally(() => setLoading(false));
   };
@@ -52,7 +52,8 @@ function Register() {
       <label htmlFor="name">
         Email:
         <input
-          ref={name}
+          value={info.name}
+          onChange={onChangeHandler}
           type="text"
           id="name"
           name="name"
@@ -63,7 +64,8 @@ function Register() {
       <label htmlFor="email">
         Email:
         <input
-          ref={email}
+          value={info.email}
+          onChange={onChangeHandler}
           type="email"
           id="email"
           name="email"
@@ -74,7 +76,8 @@ function Register() {
       <label htmlFor="password">
         Password:
         <input
-          ref={password}
+          value={info.password}
+          onChange={onChangeHandler}
           type="password"
           id="password"
           name="password"
@@ -85,7 +88,8 @@ function Register() {
       <label htmlFor="secondPassword">
         Retype Password:
         <input
-          ref={secondPassword}
+          value={info.secondPassword}
+          onChange={onChangeHandler}
           type="password"
           id="secondPassword"
           name="secondPassword"
