@@ -1,48 +1,37 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loading from "../components/Loading";
+import { Profile as IProfile } from "../types";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const [state, setState] = useState(
-    () =>
-      ({
-        name: "",
-        email: "",
-        token: localStorage.getItem("token"),
-      } as any)
-  );
+  const { data, isError, error, isLoading } = useQuery<IProfile, Error>({
+    queryKey: ["/api/users/profile"],
+    queryFn: () =>
+      axios
+        .get("/api/users/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((res) => res.data),
+  });
 
-  useEffect(() => {
-    fetch("/api/users/profile", {
-      method: "get",
-      headers: {
-        Authorization: `Bearer ${state.token}`,
-      },
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return Promise.reject(res.json());
-      })
-      .then((res) => {
-        setState({
-          state,
-          ...res,
-        });
-      })
-      .catch(async (err) => {
-        const error = await err;
-        toast.error(error.message);
-        navigate("/login");
-      });
-  }, []);
+  if (isLoading) return <Loading />;
+  if (isError) {
+    toast.error(error.message);
+    navigate("/login");
+    return null;
+  }
 
   return (
     <section>
-      <h2>Profile - Welcome {state.name}</h2>
+      <h2>Profile - Welcome {data.name}</h2>
       <ul>
-        <li>Name: {state.name}</li>
-        <li>Email: {state.email}</li>
+        <li>Name: {data.name}</li>
+        <li>Email: {data.email}</li>
       </ul>
     </section>
   );

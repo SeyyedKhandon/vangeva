@@ -1,11 +1,35 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
+import axios, { AxiosResponse } from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loading from "../components/Loading";
+import { AuthenticatedUser, User } from "../types";
 
 function Login() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [info, setInfo] = useState({ email: "", password: "" });
+  const [info, setInfo] = useState<Pick<User, "email" | "password">>({
+    email: "",
+    password: "",
+  });
+  const {
+    mutate: login,
+    isLoading,
+    isError,
+    error,
+  } = useMutation<
+    AxiosResponse<AuthenticatedUser, any>,
+    Error,
+    Pick<User, "email" | "password">
+  >({
+    mutationFn: (info) => axios.post("/api/users/login", info),
+    onSuccess: ({ data }) => {
+      localStorage.setItem("token", data.token);
+      toast(`${data.name} Logged in!`);
+      navigate("/profile");
+    },
+    // onError: (error: Error) => toast.error(error.message),
+  });
 
   const onChangeHandler = (e: any) => {
     setInfo((i) => ({ ...i, [e.target.name]: e.target.value }));
@@ -13,32 +37,11 @@ function Login() {
 
   const submitHandler = (e: any) => {
     e.preventDefault();
-    setLoading(true);
-
-    fetch("/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams(info),
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return Promise.reject(res.json());
-      })
-      .then((res) => {
-        toast(`${res.name} Logged in!`);
-        localStorage.setItem("token", res.token);
-        navigate("/profile");
-      })
-      .catch(async (err) => {
-        const error = await err;
-        toast.error(error.message);
-      })
-      .finally(() => setLoading(false));
+    login(info);
   };
 
-  if (loading) return <article aria-busy="true"></article>;
+  if (isLoading) return <Loading />;
+  if (isError) toast.error(error.message);
 
   return (
     <form method="post" onSubmit={submitHandler}>

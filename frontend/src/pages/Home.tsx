@@ -1,32 +1,26 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { toast } from "react-toastify";
+import Loading from "../components/Loading";
+import { Post } from "../types";
 
 export default function Home() {
-  const [posts, setPosts] = useState([]);
+  const { data, isError, isLoading, error } = useQuery<Post[], Error>({
+    queryKey: ["/api/posts"],
+    queryFn: () => axios.get("/api/posts").then((res) => res.data),
+  });
 
-  useEffect(() => {
-    fetch("/api/posts", {
-      method: "get",
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return Promise.reject(res.json());
-      })
-      .then((res) => {
-        setPosts(res);
-      })
-      .catch(async (err) => {
-        const error = await err;
-        toast.error(error.message);
-      });
-  }, []);
+  if (isLoading) return <Loading/>
+  if (isError) {
+    toast.error(error.message);
+    return <div>Please Refresh the page</div>;
+  }
 
   return (
     <section>
-      <h2>There are {posts.length} posts:</h2>
+      <h2>There are {data.length} posts:</h2>
       <ul>
-        {posts.map((post: any) => (
+        {data.map((post: any) => (
           <li key={post._id}>{post.text}</li>
         ))}
       </ul>

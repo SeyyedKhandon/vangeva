@@ -8,7 +8,7 @@ import postModel from "../models/post.js";
  * @access Private
  */
 const getAllPosts = asyncHandler(async (req, res) => {
-  const posts = await postModel.find({}).select("-userId");
+  const posts = await postModel.find({}).select("-userId -__v");
   res.json(posts);
 });
 

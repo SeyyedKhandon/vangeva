@@ -1,15 +1,31 @@
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loading from "../components/Loading";
+import { AuthenticatedUser, User } from "../types";
 
 function Register() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState({
     name: "",
     email: "",
     password: "",
     secondPassword: "",
+  });
+  const registerMutation = useMutation({
+    mutationFn: (info: User) =>
+      axios.post<AuthenticatedUser>("/api/users/register", info),
+    onSuccess: ({ data }) => {
+      localStorage.setItem("token", data.token);
+      toast(`${data.name} Registered!`);
+      navigate("/profile");
+    },
+    onError: (error: AxiosError) =>
+      toast.error(
+        (error.response?.data as { message: string })?.message! || error.message
+      ),
   });
 
   const onChangeHandler = (e: any) => {
@@ -21,31 +37,10 @@ function Register() {
     if (info.password != info.secondPassword)
       return toast("Password's do not match!");
 
-    setLoading(true);
-    fetch("/api/users/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams(info),
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return Promise.reject(res.json());
-      })
-      .then((res) => {
-        toast(`${res.name} Registered!`);
-        localStorage.setItem("token", res.token);
-        navigate("/profile");
-      })
-      .catch(async (err) => {
-        const error = await err;
-        toast.error(error.message);
-      })
-      .finally(() => setLoading(false));
+    registerMutation.mutate(info);
   };
 
-  if (loading) return <article aria-busy="true"></article>;
+  if (registerMutation.isLoading) return <Loading />;
 
   return (
     <form method="post" onSubmit={submitHandler}>
