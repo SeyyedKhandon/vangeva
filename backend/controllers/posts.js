@@ -8,7 +8,10 @@ import postModel from "../models/post.js";
  * @access Private
  */
 const getAllPosts = asyncHandler(async (req, res) => {
-  const posts = await postModel.find({}).select("-userId -__v");
+  const posts = await postModel
+    .find({})
+    .sort({ createdAt: -1 })
+    .select("-userId -__v");
   res.json(posts);
 });
 
@@ -29,12 +32,13 @@ const getPosts = asyncHandler(async (req, res) => {
  * @access Private
  */
 const setPost = asyncHandler(async (req, res) => {
-  if (!req.body.text) {
+  if (!req.body.text && !req.body.text) {
     res.status(400);
     throw new Error("Text field is missing!");
   }
   const post = await postModel.create({
     userId: req.user.id,
+    title: req.body.title,
     text: req.body.text,
   });
   res.json(post);
@@ -47,7 +51,7 @@ const setPost = asyncHandler(async (req, res) => {
  * @access Private
  */
 const updatePost = asyncHandler(async (req, res) => {
-  if (!req.body.text) {
+  if (!req.body.text && !req.body.text) {
     res.status(400);
     throw new Error("Please provide a text field!");
   }

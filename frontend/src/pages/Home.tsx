@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Loading from "../components/Loading";
+import PostPreview from "../components/PostPreview";
 import { Post } from "../types";
 
 export default function Home() {
@@ -10,20 +11,19 @@ export default function Home() {
     queryFn: () => axios.get("/api/posts").then((res) => res.data),
   });
 
-  if (isLoading) return <Loading/>
+  if (isLoading) return <Loading />;
   if (isError) {
     toast.error(error.message);
     return <div>Please Refresh the page</div>;
   }
 
   return (
-    <section>
+    <section className="mx-4">
       <h2>There are {data.length} posts:</h2>
-      <ul>
-        {data.map((post: any) => (
-          <li key={post._id}>{post.text}</li>
-        ))}
-      </ul>
+
+      {data.map((post: any) => (
+        <PostPreview key={post._id} post={post} />
+      ))}
     </section>
   );
 }

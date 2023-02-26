@@ -1,5 +1,3 @@
-import "@picocss/pico";
-import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 
 import {
@@ -16,11 +14,12 @@ import Header from "./components/Header";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import AddPost from "./pages/AddPost";
+import Footer from "./components/Footer";
 function App() {
   return (
     <Router>
-      <main className="container">
-        <Header />
+      <Header />
+      <main className="container mx-auto grow">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -29,10 +28,12 @@ function App() {
           <Route path="/add-post" element={<AddPost />} />
           <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>
-        <ToastContainer position="bottom-center" theme="dark" />
       </main>
+      <Footer />
+      <ToastContainer position="bottom-center" theme="dark" />
     </Router>
   );
 }
 
 export default App;
+
