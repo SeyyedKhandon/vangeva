@@ -1,9 +1,10 @@
 {
-  "name": "mern-blog-frontend",
+  "name": "vangeva-frontend",
   "private": true,
   "version": "1.0.0",
-  "author": "SeyyedMahdi",
+  "author": "SeyyedKhandon",
   "license": "MIT",
+  "description": "MERN Stack Blog - Frontend",
   "type": "module",
   "scripts": {
     "start": "vite",

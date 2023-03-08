@@ -3,17 +3,20 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../components/Loading";
+import useLocalStorage from "../hooks/useLocalStorage";
 import { Profile as IProfile } from "../types";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const [token] = useLocalStorage("token");
   const { data, isError, error, isLoading } = useQuery<IProfile, Error>({
     queryKey: ["/api/users/profile"],
+    enabled: !!token,
     queryFn: () =>
       axios
         .get("/api/users/profile", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         })
         .then((res) => res.data),

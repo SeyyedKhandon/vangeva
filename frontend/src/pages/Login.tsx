@@ -1,19 +1,21 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../components/Loading";
+import { useAuthContext } from "../store/auth";
 import { AuthenticatedUser, User } from "../types";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [info, setInfo] = useState<Pick<User, "email" | "password">>({
     email: "",
     password: "",
   });
   const {
-    mutate: login,
+    mutate: submitLoginInfo,
     isLoading,
     isError,
     error,
@@ -24,11 +26,10 @@ function Login() {
   >({
     mutationFn: (info) => axios.post("/api/users/login", info),
     onSuccess: ({ data }) => {
-      localStorage.setItem("token", data.token);
+      login(data.token);
       toast(`${data.name} Logged in!`);
       navigate("/profile");
     },
-    // onError: (error: Error) => toast.error(error.message),
   });
 
   const onChangeHandler = (e: any) => {
@@ -37,7 +38,7 @@ function Login() {
 
   const submitHandler = (e: any) => {
     e.preventDefault();
-    login(info);
+    submitLoginInfo(info);
   };
 
   if (isLoading) return <Loading />;
