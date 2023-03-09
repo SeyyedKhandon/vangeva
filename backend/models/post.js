@@ -7,6 +7,10 @@ const postSchema = mongoose.Schema(
       required: true,
       ref: "User",
     },
+    author: {
+      type: String,
+      required: [true],
+    },
     title: {
       type: String,
       required: [true, "Please add a title value"],
@@ -15,10 +19,14 @@ const postSchema = mongoose.Schema(
       type: String,
       required: [true, "Please add a text value"],
     },
+    thumbnailUrl: {
+      type: String,
+    },
   },
   {
     timestamps: true,
   }
 );
+
 const postModel = mongoose.model("Post", postSchema);
 export default postModel;

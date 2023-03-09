@@ -45,7 +45,7 @@ function Register() {
   return (
     <form method="post" onSubmit={submitHandler}>
       <label htmlFor="name">
-        Email:
+        Name:
         <input
           value={info.name}
           onChange={onChangeHandler}

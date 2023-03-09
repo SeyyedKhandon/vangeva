@@ -7,7 +7,7 @@ import { Post } from "../types";
 
 export default function AddPost() {
   const [token] = useState(() => localStorage.getItem("token"));
-  const [post, setPost] = useState({ title: "", text: "" });
+  const [post, setPost] = useState({ title: "", text: "", thumbnailUrl: "" });
   const postMutation = useMutation({
     mutationFn: (post: { title: string; text: string }) =>
       axios.post<Post>("/api/posts", post, {
@@ -35,16 +35,31 @@ export default function AddPost() {
           value={post.title}
           onChange={(e) => setPost((p) => ({ ...p, title: e.target.value }))}
           name="text"
+          id="text"
           placeholder="Enter your text"
           required
         />
       </label>
-      <label htmlFor="text">
+      <label htmlFor="cover-image">
+        Thumbnail Image URL:
+        <input
+          value={post.thumbnailUrl}
+          onChange={(e) =>
+            setPost((p) => ({ ...p, thumbnailUrl: e.target.value }))
+          }
+          name="text"
+          id="cover-image"
+          placeholder="Enter your cover image"
+          required
+        />
+      </label>
+      <label htmlFor="textarea">
         Enter your text here:
         <textarea
           value={post.text}
           onChange={(e) => setPost((p) => ({ ...p, text: e.target.value }))}
           name="text"
+          id="textarea"
           placeholder="Enter your text"
           required
         />

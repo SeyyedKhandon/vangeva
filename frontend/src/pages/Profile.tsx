@@ -1,3 +1,4 @@
+import Posts from "@/components/Posts";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,15 +9,13 @@ import { Profile as IProfile } from "../types";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const [token] = useLocalStorage("token");
   const { data, isError, error, isLoading } = useQuery<IProfile, Error>({
     queryKey: ["/api/users/profile"],
-    enabled: !!token,
     queryFn: () =>
       axios
         .get("/api/users/profile", {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         })
         .then((res) => res.data),
@@ -28,6 +27,7 @@ export default function Profile() {
     navigate("/login");
     return null;
   }
+  const posts = (id: string) => <Posts url={`/api/posts/${id}`} isProtected />;
 
   return (
     <section>
@@ -36,6 +36,7 @@ export default function Profile() {
         <li>Name: {data.name}</li>
         <li>Email: {data.email}</li>
       </ul>
+      {data._id ? posts(data._id) : null}
     </section>
   );
 }

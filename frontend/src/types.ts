@@ -1,9 +1,11 @@
 export interface Post {
   _id: string;
+  author: string;
   text: string;
   title: string;
   createdAt: string;
   updatedAt: string;
+  thumbnailUrl?: string;
 }
 export interface Profile {
   _id: string;

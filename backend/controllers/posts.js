@@ -40,6 +40,8 @@ const setPost = asyncHandler(async (req, res) => {
     userId: req.user.id,
     title: req.body.title,
     text: req.body.text,
+    thumbnailUrl: req.body.thumbnailUrl,
+    author: req.user.name,
   });
   res.json(post);
 });
